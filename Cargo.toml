@@ -1,5 +1,5 @@
 [package]
-name = "k8s-exec-rs"
+name = "k8s-webterm-connector"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,4 +10,4 @@ url = "*"
 tokio = { version = "*", features = ["full"] }
 tokio-util = { version = "*", features = ["codec"] }
 tokio-tungstenite = { version = "*", features = ["native-tls"] }
-futures-util = { version = "*", features = ["io", "sink", "std"] }
+futures-util = { version = "*", features = ["std", "sink"] }
