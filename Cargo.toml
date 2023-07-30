@@ -1,0 +1,13 @@
+[package]
+name = "k8s-exec-rs"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+url = "*"
+tokio = { version = "*", features = ["full"] }
+tokio-util = { version = "*", features = ["codec"] }
+tokio-tungstenite = { version = "*", features = ["native-tls"] }
+futures-util = { version = "*", features = ["io", "sink", "std"] }
