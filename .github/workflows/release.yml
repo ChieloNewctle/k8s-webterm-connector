@@ -6,7 +6,7 @@ permissions:
 on:
   push:
     tags:
-      - k8s-webterm-connector-v[0-9]+.*
+      - v[0-9]+.*
 
 jobs:
   create-release:
