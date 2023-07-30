@@ -10,3 +10,7 @@ tokio = { version = "*", features = ["full"] }
 tokio-util = { version = "*", features = ["codec"] }
 tokio-tungstenite = { version = "*", features = ["native-tls"] }
 futures-util = { version = "*", features = ["std", "sink"] }
+
+[profile.release]
+lto = true
+strip = true
