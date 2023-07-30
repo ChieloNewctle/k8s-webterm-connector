@@ -16,7 +16,7 @@ trap "pkill -P $$" EXIT
 socat tcp:localhost:${WEBTERM_PORT} \
 	exec:"${DIR_NAME}/punch-hole-via-webterm.sh ${CONTAINER_SSH_BIND_PORT} ${HOLE_SOCKET}" &
 
-until [ -f "${HOLE_SOCKET}" ]; do
+until [ -e "${HOLE_SOCKET}" ]; do
 	sleep 1
 done
 
