@@ -8,7 +8,7 @@ license = "MIT"
 url = "*"
 tokio = { version = "*", features = ["full"] }
 tokio-util = { version = "*", features = ["codec"] }
-tokio-tungstenite = { version = "*", features = ["native-tls"] }
+tokio-tungstenite = { version = "*", features = ["rustls-tls-webpki-roots"] }
 futures-util = { version = "*", features = ["std", "sink"] }
 
 [profile.release]
