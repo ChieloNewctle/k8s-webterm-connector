@@ -46,7 +46,7 @@ Host <hostname-you-like>
 ### Example
 
 For example, k8s-webterm-connector is **running** and binds `27730`.
-Inside the target container, SSH server can listen to TCP port `10022`.
+Inside the target container, `10022` TCP port is available or used for SSH.
 
 ```
 Host k8s-container
@@ -75,7 +75,7 @@ This tool wraps `tools/proxy-ssh-via-k8s-webterm.sh` and forward SSH port to the
 ### Example
 
 For example, k8s-webterm-connector is **running** and binds `27730`.
-Inside the target container, SSH server can listen to TCP port `10022`.
+Inside the target container, `10022` TCP port is available or used for SSH.
 And you would like to use SSH locally to connect the container on `27731`.
 
 ```
