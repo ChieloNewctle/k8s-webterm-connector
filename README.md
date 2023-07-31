@@ -26,9 +26,45 @@ Keep it running, and then you can test it with:
 socat - tcp:localhost:27730
 ```
 
+## SSH via k8s-webterm-connector
+
+> As long as an IO method exists, you can use it for SSH conneciton.
+
+`socat` and `openssh-server` should be installed in the image of the target containers.
+
+You can use `tools/proxy-ssh-via-k8s-webterm.sh`
+as `ProxyCommand` in your `~/.ssh/config`.
+
+```
+Host <hostname-you-like>
+  ProxyCommand <...>/k8s-webterm-connector/tools/proxy-ssh-via-k8s-webterm.sh <connector-bind-port> <port-inside-container>
+  HostName <any-valid-hostname>
+  User <username-in-container>
+  ServerAliveInterval 15
+```
+
+### Example
+
+For example, k8s-webterm-connector is **running** and binds `27730`.
+Inside the target container, SSH server can listen to TCP port `10022`.
+
+```
+Host k8s-container
+  ProxyCommand ~/k8s-webterm-connector/tools/proxy-ssh-via-k8s-webterm.sh 27730 10022
+  HostName container
+  User root
+  ServerAliveInterval 15
+```
+
+Then you can ssh into the container:
+
+```
+ssh k8s-container
+```
+
 ## Forward SSH via k8s-webterm-connector
 
-As long as an IO method exists, you can use it for SSH conneciton.
+This tool wraps `tools/proxy-ssh-via-k8s-webterm.sh` and forward SSH port to the local machine.
 
 ```
 ./tools/k8s-webterm-ssh-forward.sh <k8s-webterm-connector-bind-port> <pod-ssh-port> <forward-ssh-bind-port>
@@ -36,8 +72,10 @@ As long as an IO method exists, you can use it for SSH conneciton.
 
 `socat` and `openssh-server` should be installed in the image of the target containers.
 
-For example, k8s-webterm-connector binds `27730`.
-The container can run an SSH server on `10022`.
+### Example
+
+For example, k8s-webterm-connector is **running** and binds `27730`.
+Inside the target container, SSH server can listen to TCP port `10022`.
 And you would like to use SSH locally to connect the container on `27731`.
 
 ```
