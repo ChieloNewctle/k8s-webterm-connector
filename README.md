@@ -9,15 +9,37 @@ You can tweak it to suit your needs.
 ## Usage
 
 ```
-cargo run <tcp-address-to-bind> <websocket-url>
+cargo run <tcp-address-to-bind> [websocket-url | file-url]
 ```
 
-You can also use the latest release instead of `cargo run`.
+**You can also use [the latest release](releases/latest) instead of `cargo run`.**
+
+### WebSocket URL Example
 
 For example, bind `localhost:27730` with `wss://example.com/k8s-pod/exec?token=TOKEN`:
 
 ```
 cargo run localhost:27730 'wss://example.com/k8s-pod/exec?token=TOKEN'
+```
+
+Keep it running, and then you can test it with:
+
+```
+socat - tcp:localhost:27730
+```
+
+### File URL Example
+
+For example, a file in `/tmp/k8s-webterm-connector-ws-27730-url.txt` contains:
+
+```
+wss://example.com/k8s-pod/exec?token=TOKEN
+```
+
+Then you can bind `localhost:27730` to the webterm URL in that file with:
+
+```
+cargo run localhost:27730 file:///tmp/k8s-webterm-connector-ws-27730-url.txt
 ```
 
 Keep it running, and then you can test it with:
@@ -65,6 +87,8 @@ ssh k8s-container
 ## Forward SSH via k8s-webterm-connector
 
 This tool wraps `tools/proxy-ssh-via-k8s-webterm.sh` and forward SSH port to the local machine.
+It will be more stable if URL to the webterm is constantly changing,
+but less efficient as only one connection is created.
 
 ```
 ./tools/k8s-webterm-ssh-forward.sh <k8s-webterm-connector-bind-port> <pod-ssh-port> <forward-ssh-bind-port>
