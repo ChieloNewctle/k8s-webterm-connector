@@ -3,7 +3,9 @@
 > Tired with web terminals?
 > Let's use it with CLI!
 
-This is just a simple demo to bind a TCP port with k8s exec websocket API.
+This is just a simple demo to bind a TCP port with k8s exec websocket API,
+which use `channel.k8s.io` as subprotocol.
+
 You can tweak it to suit your needs.
 
 ## Usage
