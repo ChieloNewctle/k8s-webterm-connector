@@ -1,3 +1,4 @@
+use std::fs::read_to_string;
 use std::time::Duration;
 
 use futures_util::{SinkExt, StreamExt};
@@ -8,12 +9,20 @@ use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::{connect_async, tungstenite};
 use tokio_util::codec::{BytesCodec, FramedRead};
 
-async fn handle_conn(target_url: String, target_host: String, mut socket: TcpStream) {
+async fn handle_conn(target_url: url::Url, mut socket: TcpStream) {
+    let target_host = match target_url.host_str() {
+        Some(res) => res.to_owned(),
+        None => {
+            eprintln!("no hostname found in url: {}", target_url);
+            return;
+        }
+    };
+
     let (socket_reader, mut socket_writer) = socket.split();
     let mut framed_reader = FramedRead::new(socket_reader, BytesCodec::new());
 
-    let ws_conn_request = tungstenite::handshake::client::Request::get(target_url)
-        .header("Host", &target_host)
+    let ws_conn_request = tungstenite::handshake::client::Request::get::<String>(target_url.into())
+        .header("Host", target_host)
         .header("Sec-WebSocket-Protocol", "channel.k8s.io")
         .header("Connection", "Upgrade")
         .header("Upgrade", "websocket")
@@ -111,25 +120,50 @@ async fn handle_conn(target_url: String, target_host: String, mut socket: TcpStr
     }
 }
 
+fn get_target_url(url_arg: &url::Url) -> Option<url::Url> {
+    match url_arg.scheme() {
+        "file" => match read_to_string(url_arg.path()) {
+            Ok(content) => match url::Url::parse(&content) {
+                Ok(res) => Some(res),
+                Err(err) => {
+                    eprintln!("failed to parse url in {}: {:?}", url_arg.path(), err);
+                    None
+                }
+            },
+            Err(err) => {
+                eprintln!("failed to open {}: {:?}", url_arg.path(), err);
+                None
+            }
+        },
+        _ => Some(url_arg.to_owned()),
+    }
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let bind_addr = std::env::args().nth(1).expect("no bind address given");
-
-    let target_url = std::env::args().nth(2).expect("no bind address given");
-    let parsed_url = url::Url::parse(&target_url).expect("wrong format of url");
-    let target_host = parsed_url.host_str().expect("no hostname found in url");
-
     let listener = TcpListener::bind(&bind_addr).await?;
+    let tcp_listen_addr = listener
+        .local_addr()
+        .expect("failed to get tcp listen address");
+    eprintln!("listening to {}...", tcp_listen_addr);
 
-    eprintln!("listening to {}...", bind_addr);
+    let url_arg = std::env::args().nth(2).unwrap_or(format!(
+        "file:///tmp/k8s-webterm-connector-ws-{}-url.txt",
+        tcp_listen_addr.port()
+    ));
+    let parsed_url_arg = url::Url::parse(&url_arg).expect("wrong format of url");
+    eprintln!("url: {}", parsed_url_arg);
 
     loop {
         let (socket, remote_addr) = listener.accept().await?;
         eprintln!("remote address: {:?}", remote_addr);
-        tokio::spawn(handle_conn(
-            target_url.to_owned(),
-            target_host.to_owned(),
-            socket,
-        ));
+
+        let target_url = match get_target_url(&parsed_url_arg) {
+            Some(res) => res,
+            None => continue,
+        };
+
+        tokio::spawn(handle_conn(target_url.to_owned(), socket));
     }
 }
