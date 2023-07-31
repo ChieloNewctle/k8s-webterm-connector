@@ -11,10 +11,10 @@ You can tweak it to suit your needs.
 ## Usage
 
 ```
-cargo run <tcp-address-to-bind> [websocket-url | file-url]
+cargo run <tcp-address-to-bind> [websocket-url|file-url]
 ```
 
-**You can also use [the latest release](releases/latest) instead of `cargo run`.**
+**You can also use [the latest release](https://github.com/ChieloNewctle/k8s-webterm-connector/releases/latest) instead of `cargo run`.**
 
 ### WebSocket URL Example
 
