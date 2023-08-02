@@ -86,7 +86,7 @@ Then you can ssh into the container:
 ssh k8s-container
 ```
 
-## Forward SSH via k8s-webterm-connector
+## Multiplex SSH via k8s-webterm-connector and port forwarding
 
 This tool wraps `tools/proxy-ssh-via-k8s-webterm.sh` and forward SSH port to the local machine.
 
