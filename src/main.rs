@@ -1,3 +1,4 @@
+use std::env;
 use std::fs::read_to_string;
 use std::time::Duration;
 
@@ -142,21 +143,36 @@ fn get_target_url(url_arg: &url::Url) -> Option<url::Url> {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let bind_addr = std::env::args().nth(1).expect("no bind address given");
-    let listener = TcpListener::bind(&bind_addr).await?;
+    let listener = TcpListener::bind(&bind_addr)
+        .await
+        .expect("failed to bind addr");
     let tcp_listen_addr = listener
         .local_addr()
         .expect("failed to get tcp listen address");
     eprintln!("listening to {}...", tcp_listen_addr);
 
     let url_arg = std::env::args().nth(2).unwrap_or(format!(
-        "file:///tmp/k8s-webterm-connector-ws-{}-url.txt",
-        tcp_listen_addr.port()
+        "file://{}",
+        env::temp_dir()
+            .join(format!(
+                "k8s-webterm-connector-ws-{}-url.txt",
+                tcp_listen_addr.port()
+            ))
+            .into_os_string()
+            .into_string()
+            .expect("failed to build up url text file in temp dir"),
     ));
     let parsed_url_arg = url::Url::parse(&url_arg).expect("wrong format of url");
     eprintln!("url: {}", parsed_url_arg);
 
     loop {
-        let (socket, remote_addr) = listener.accept().await?;
+        let (socket, remote_addr) = match listener.accept().await {
+            Ok(res) => res,
+            Err(err) => {
+                eprintln!("failed to establish connection: {:?}", err);
+                continue;
+            }
+        };
         eprintln!("remote address: {:?}", remote_addr);
 
         let target_url = match get_target_url(&parsed_url_arg) {
