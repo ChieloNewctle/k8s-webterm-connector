@@ -151,17 +151,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .expect("failed to get tcp listen address");
     eprintln!("listening to {}...", tcp_listen_addr);
 
-    let url_arg = std::env::args().nth(2).unwrap_or(format!(
-        "file://{}",
-        env::temp_dir()
-            .join(format!(
-                "k8s-webterm-connector-ws-{}-url.txt",
-                tcp_listen_addr.port()
-            ))
-            .into_os_string()
-            .into_string()
-            .expect("failed to build up url text file in temp dir"),
-    ));
+    let url_arg = std::env::args().nth(2).unwrap_or(
+        url::Url::from_file_path(env::temp_dir().join(format!(
+            "k8s-webterm-connector-ws-{}-url.txt",
+            tcp_listen_addr.port()
+        )))
+        .expect("failed to build up url text file in temp dir")
+        .to_string(),
+    );
     let parsed_url_arg = url::Url::parse(&url_arg).expect("wrong format of url");
     eprintln!("url: {}", parsed_url_arg);
 
