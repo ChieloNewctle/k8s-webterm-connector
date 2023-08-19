@@ -10,6 +10,9 @@ echo "mkdir /run/sshd"
 echo "chmod 700 /run/sshd"
 echo "/usr/sbin/sshd -p ${CONTAINER_SSH_BIND_PORT}"
 
+echo "mkdir -p ~/.ssh"
+[ -e ~/.ssh/id_rsa.pub ] && echo "echo \"$(cat ~/.ssh/id_rsa.pub)\" > ~/.ssh/authorized_keys && chmod -R 600 ~/.ssh" || true
+
 echo "echo && echo ${UUID_UPPER} | tr '[:upper:]' '[:lower:'] \
   && socat -T30 - tcp:localhost:${CONTAINER_SSH_BIND_PORT}"
 

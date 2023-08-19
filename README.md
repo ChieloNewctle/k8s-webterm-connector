@@ -78,6 +78,7 @@ Host k8s-container
   HostName container
   User root
   ServerAliveInterval 15
+  StrictHostKeyChecking no
 ```
 
 Then you can ssh into the container:
