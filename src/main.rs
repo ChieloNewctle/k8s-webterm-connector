@@ -123,19 +123,22 @@ async fn handle_conn(target_url: url::Url, mut socket: TcpStream) {
 
 fn get_target_url(url_arg: &url::Url) -> Option<url::Url> {
     match url_arg.scheme() {
-        "file" => match read_to_string(url_arg.path()) {
-            Ok(content) => match url::Url::parse(&content) {
-                Ok(res) => Some(res),
+        "file" => {
+            let path = url_arg.to_file_path().unwrap();
+            match read_to_string(&path) {
+                Ok(content) => match url::Url::parse(&content) {
+                    Ok(res) => Some(res),
+                    Err(err) => {
+                        eprintln!("failed to parse url in {:?}: {:?}", path, err);
+                        None
+                    }
+                },
                 Err(err) => {
-                    eprintln!("failed to parse url in {}: {:?}", url_arg.path(), err);
+                    eprintln!("failed to open {:?}: {:?}", path, err);
                     None
                 }
-            },
-            Err(err) => {
-                eprintln!("failed to open {}: {:?}", url_arg.path(), err);
-                None
             }
-        },
+        }
         _ => Some(url_arg.to_owned()),
     }
 }
