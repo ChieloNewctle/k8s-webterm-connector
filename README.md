@@ -61,7 +61,8 @@ as `ProxyCommand` in your `~/.ssh/config`.
 
 ```ssh-config
 Host <hostname-you-like>
-  ProxyCommand <...>/k8s-webterm-connector/tools/proxy-ssh-via-k8s-webterm.sh <connector-bind-port> <port-inside-container>
+  ProxyCommand <...>/k8s-webterm-connector/tools/proxy-ssh-via-k8s-webterm.sh %p <ssh-port-inside-container>
+  Port <connector-bind-port>
   HostName <any-valid-hostname>
   User <username-in-container>
   ServerAliveInterval 15
@@ -75,7 +76,8 @@ Inside the target container, `10022` TCP port is available or used for SSH.
 
 ```ssh-config
 Host k8s-container
-  ProxyCommand ~/k8s-webterm-connector/tools/proxy-ssh-via-k8s-webterm.sh 27730 10022
+  ProxyCommand ~/k8s-webterm-connector/tools/proxy-ssh-via-k8s-webterm.sh %p 10022
+  Port 27730
   HostName container
   User root
   ServerAliveInterval 15
