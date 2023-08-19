@@ -65,6 +65,7 @@ Host <hostname-you-like>
   HostName <any-valid-hostname>
   User <username-in-container>
   ServerAliveInterval 15
+  StrictHostKeyChecking no
 ```
 
 ### Example
@@ -78,6 +79,7 @@ Host k8s-container
   HostName container
   User root
   ServerAliveInterval 15
+  StrictHostKeyChecking no
 ```
 
 Then you can ssh into the container:
