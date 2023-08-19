@@ -65,6 +65,7 @@ Host <hostname-you-like>
   HostName <any-valid-hostname>
   User <username-in-container>
   ServerAliveInterval 15
+  StrictHostKeyChecking no
 ```
 
 ### Example
