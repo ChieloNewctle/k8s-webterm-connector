@@ -92,8 +92,8 @@ ssh k8s-container
 
 This tool wraps `tools/proxy-ssh-via-k8s-webterm.sh` and forward SSH port to the local machine.
 
-It will be *more stable* if URL to the webterm is constantly changing,
-but *less efficient* as only one connection is created.
+It will be _more stable_ if URL to the webterm is constantly changing,
+but _less efficient_ as only one connection is created.
 
 ```sh
 ./tools/k8s-webterm-ssh-forward.sh <k8s-webterm-connector-bind-port> <pod-ssh-port> <forward-ssh-bind-port>

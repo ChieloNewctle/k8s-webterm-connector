@@ -23,9 +23,9 @@ echo "echo && echo ${UUID_UPPER} | tr '[:upper:]' '[:lower:'] \
 
 # drop useless outputs that are ahead of ssh connection
 while read line; do
-	if echo "$line" | grep -q "$UUID_LOWER" >/dev/null; then
-		break
-	else
-		true
-	fi
+  if echo "$line" | grep -q "$UUID_LOWER" >/dev/null; then
+    break
+  else
+    true
+  fi
 done
