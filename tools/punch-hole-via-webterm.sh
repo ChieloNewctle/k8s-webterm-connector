@@ -1,7 +1,7 @@
 #!/bin/sh
 CONTAINER_SSH_BIND_PORT="$1"
 
-UUID_LOWER=$(uuidgen -r | tr '[:upper:]' '[:lower:'])
+UUID_LOWER=$(uuidgen -r | tr '[:upper:]' '[:lower:]')
 UUID_UPPER=$(echo "$UUID_LOWER" | tr '[:lower:]' '[:upper:]')
 
 # mute tty echo
