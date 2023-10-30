@@ -9,7 +9,7 @@ url = "2.4.1"
 tokio = { version = "1.33.0", features = ["full"] }
 tokio-util = { version = "0.7.9", features = ["codec"] }
 tokio-tungstenite = { version = "0.20.1", features = ["rustls-tls-webpki-roots"] }
-futures-util = { version = "0.3.28", features = ["std", "sink"] }
+futures-util = { version = "0.3.29", features = ["std", "sink"] }
 
 [profile.release]
 lto = true
