@@ -18,16 +18,16 @@ cargo run <tcp-address-to-bind> [websocket-url|file-url]
 
 ### WebSocket URL Example
 
-For example, bind `localhost:27730` with `wss://example.com/k8s-pod/exec?token=TOKEN`:
+For example, bind `127.0.0.1:27730` with `wss://example.com/k8s-pod/exec?token=TOKEN`:
 
 ```sh
-cargo run localhost:27730 'wss://example.com/k8s-pod/exec?token=TOKEN'
+cargo run 127.0.0.1:27730 'wss://example.com/k8s-pod/exec?token=TOKEN'
 ```
 
 Keep it running, and then you can test it with:
 
 ```sh
-socat - tcp:localhost:27730
+socat - tcp:127.0.0.1:27730
 ```
 
 ### File URL Example
@@ -38,16 +38,16 @@ For example, a file in `/tmp/k8s-webterm-connector-ws-27730-url.txt` contains th
 wss://example.com/k8s-pod/exec?token=TOKEN
 ```
 
-Then you can bind `localhost:27730` to the webterm URL in that file with:
+Then you can bind `127.0.0.1:27730` to the webterm URL in that file with:
 
 ```sh
-cargo run localhost:27730 file:///tmp/k8s-webterm-connector-ws-27730-url.txt
+cargo run 127.0.0.1:27730 file:///tmp/k8s-webterm-connector-ws-27730-url.txt
 ```
 
 Keep it running, and then you can test it with:
 
 ```sh
-socat - tcp:localhost:27730
+socat - tcp:127.0.0.1:27730
 ```
 
 ## SSH via k8s-webterm-connector
@@ -116,5 +116,5 @@ And you would like to use SSH locally to connect the container on `27731`.
 Keep it running, and then you can `ssh` to the container:
 
 ```sh
-ssh -p 27731 USERNAME-IN-CONTAINER@localhost
+ssh -p 27731 USERNAME-IN-CONTAINER@127.0.0.1
 ```

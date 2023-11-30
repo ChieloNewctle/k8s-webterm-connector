@@ -10,7 +10,7 @@ rm -f "${HOLE_SOCKET}"
 trap "rm -f '${HOLE_SOCKET}'" EXIT
 trap "pkill -P $$" EXIT
 
-socat -T30 tcp:localhost:${WEBTERM_PORT} \
+socat -T30 tcp:127.0.0.1:${WEBTERM_PORT} \
   system:"'${DIR_NAME}/punch-hole-via-webterm.sh' '${CONTAINER_SSH_BIND_PORT}' && socat -T30 - 'unix-l:${HOLE_SOCKET},reuseaddr'" &
 
 until [ -e "${HOLE_SOCKET}" ]; do

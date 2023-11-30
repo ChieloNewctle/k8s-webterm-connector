@@ -19,7 +19,7 @@ echo "sort -u ~/.ssh/authorized_keys -o ~/.ssh/authorized_keys"
 
 # execute socat to bridge stdio with ssh tcp connection
 echo "echo && echo ${UUID_UPPER} | tr '[:upper:]' '[:lower:'] \
-  && socat -T30 - tcp:localhost:${CONTAINER_SSH_BIND_PORT}"
+  && socat -T30 - tcp:127.0.0.1:${CONTAINER_SSH_BIND_PORT}"
 
 # drop useless outputs that are ahead of ssh connection
 while read line; do

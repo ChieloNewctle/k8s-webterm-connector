@@ -11,6 +11,6 @@ trap "pkill -P $$" EXIT
 
 ssh -N \
   -o "ProxyCommand '${DIR_NAME}/proxy-ssh-via-k8s-webterm.sh' '${WEBTERM_PORT}' '${CONTAINER_SSH_BIND_PORT}'" \
-  -L ${FORWARD_SSH_BIND_PORT}:localhost:${CONTAINER_SSH_BIND_PORT} \
+  -L ${FORWARD_SSH_BIND_PORT}:127.0.0.1:${CONTAINER_SSH_BIND_PORT} \
   -o ServerAliveInterval=15 \
   root@container
