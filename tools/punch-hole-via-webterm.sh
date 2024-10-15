@@ -8,7 +8,9 @@ UUID_UPPER=$(echo "$UUID_LOWER" | tr '[:lower:]' '[:upper:]')
 echo "stty raw -echo"
 
 # prepare ssh server
-echo "mkdir /run/sshd"
+echo "mkdir -p /etc/sshd"
+echo "test -f /etc/ssh/ssh_host_rsa_key.pub || ssh-keygen -A"
+echo "mkdir -p /run/sshd"
 echo "chmod 700 /run/sshd"
 echo "/usr/sbin/sshd -p ${CONTAINER_SSH_BIND_PORT}"
 
