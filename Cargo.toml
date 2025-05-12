@@ -6,7 +6,7 @@ license = "MIT"
 
 [dependencies]
 url = "2.5.4"
-tokio = { version = "1.44.1", features = ["full"] }
+tokio = { version = "1.45.0", features = ["full"] }
 tokio-util = { version = "0.7.14", features = ["codec"] }
 tokio-tungstenite = { version = "0.26.2", features = ["native-tls"] }
 futures-util = { version = "0.3.31", features = ["std", "sink"] }
