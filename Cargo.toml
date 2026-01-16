@@ -5,7 +5,7 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
-url = "2.5.7"
+url = "2.5.8"
 tokio = { version = "1.49.0", features = ["full"] }
 tokio-util = { version = "0.7.18", features = ["codec"] }
 tokio-tungstenite = { version = "0.28.0", features = ["native-tls"] }
