@@ -1,10 +1,8 @@
 on:
   release:
     types: [created]
-
 permissions:
   contents: write
-
 jobs:
   release:
     name: release ${{ matrix.target }}
@@ -20,7 +18,11 @@ jobs:
           - target: x86_64-apple-darwin
             archive: tar.gz
     steps:
-      - uses: actions/checkout@v7
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
       - name: Compile and release
         uses: rust-build/rust-build.action@v1.4.5
         env:

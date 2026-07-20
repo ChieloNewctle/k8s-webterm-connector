@@ -1,0 +1,65 @@
+name: Cargo Build & Test
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+env:
+  CARGO_TERM_COLOR: always
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain:
+          - stable
+    steps:
+      - &checkout
+        name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+      - run: rustup component add clippy
+      - run: cargo clippy
+        env:
+          RUSTFLAGS: "-D warnings"
+      - run: cargo build --verbose
+      - run: cargo test --verbose
+      - run: cargo build --all-features --verbose
+      - run: cargo test --all-features --verbose
+      - run: cargo install cargo-all-features
+      - run: cargo check-all-features -- --verbose
+      - run: cargo build-all-features -- --verbose
+      - run: cargo test-all-features -- --verbose
+  rustfmt:
+    name: Check Format
+    runs-on: ubuntu-latest
+    steps:
+      - *checkout
+      - run: rustup update nightly && rustup default nightly
+      - run: rustup component add rustfmt
+      - run: cargo fmt --all --check
+  dependabot:
+    name: Dependabot Auto-merge
+    if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'}}
+    needs: [build-and-test, rustfmt]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - id: metadata
+        uses: dependabot/fetch-metadata@v3
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - run: |
+          gh pr review --approve "$PR_URL"
+          gh pr merge --squash --auto "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
