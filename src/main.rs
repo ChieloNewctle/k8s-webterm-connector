@@ -5,9 +5,10 @@ use std::time::Duration;
 use futures_util::{SinkExt, StreamExt};
 use tokio::io::AsyncWriteExt;
 use tokio::net::{TcpListener, TcpStream};
-use tokio_tungstenite::tungstenite::handshake::client::generate_key;
 use tokio_tungstenite::tungstenite::Message;
+use tokio_tungstenite::tungstenite::handshake::client::generate_key;
 use tokio_tungstenite::{connect_async, tungstenite};
+use tokio_util::bytes::Bytes;
 use tokio_util::codec::{BytesCodec, FramedRead};
 
 async fn handle_conn(target_url: url::Url, mut socket: TcpStream) {
@@ -36,18 +37,16 @@ async fn handle_conn(target_url: url::Url, mut socket: TcpStream) {
         .await
         .expect("failed to create connection");
 
-    // eprintln!("websocet connect response: {:?}", _ws_conn_response);
-
     let (mut ws_sink, mut ws_stream) = ws_client.split();
 
     let mut keepalive_timer = tokio::time::interval(Duration::from_secs(10));
 
     loop {
+        const KEEP_ALIVE_PACKET: Message = Message::Binary(Bytes::from_static(b"\0"));
         tokio::select! {
             _keepalive = keepalive_timer.tick() => {
-                // eprintln!("keepalive: {:?}", _keepalive);
-                ws_sink.send(
-                    Message::Binary(vec![0u8]))
+                ws_sink
+                    .send(KEEP_ALIVE_PACKET)
                     .await
                     .expect("failed to send to websocket sink");
             }
@@ -57,20 +56,20 @@ async fn handle_conn(target_url: url::Url, mut socket: TcpStream) {
                         Message::Binary(data) => {
                             match data[0] {
                                 1 => {
-                                    socket_writer.write_all(&data[1..])
+                                    socket_writer
+                                        .write_all(&data[1..])
                                         .await
                                         .expect("failed to write to tcp sink");
                                 }
                                 2 => {
                                     eprintln!("web terminal stderr: {:?}", data);
                                 }
-                                _ => {
-                                    // eprintln!("unknow binary data from websocket: {:?}", data);
-                                }
+                                _ => {}
                             }
                         }
                         Message::Ping(data) => {
-                            ws_sink.send(Message::Pong(data))
+                            ws_sink
+                                .send(Message::Pong(data))
                                 .await
                                 .expect("failed to send to websocket sink");
                         }
@@ -78,9 +77,7 @@ async fn handle_conn(target_url: url::Url, mut socket: TcpStream) {
                             eprintln!("websocket closed: {:?}", close);
                             return;
                         }
-                        _msg => {
-                            // eprintln!("websocket got unhandled message: {:?}", _msg);
-                        },
+                        _msg => {}
                     },
                     Some(Err(err)) => {
                         eprintln!("got error from websocket stream: {:?}", err);
@@ -95,14 +92,12 @@ async fn handle_conn(target_url: url::Url, mut socket: TcpStream) {
             bytes_res = framed_reader.next() => {
                 match bytes_res {
                     Some(Ok(bytes)) => {
-                        ws_sink.send(
-                            Message::Binary(
-                                (vec![0u8])
-                                    .into_iter()
-                                    .chain(bytes.into_iter())
-                                    .collect()
-                            )
-                        ).await.expect("failed to send to websocket sink");
+                        ws_sink
+                            .send(Message::Binary(
+                                (vec![0u8]).into_iter().chain(bytes.into_iter()).collect(),
+                            ))
+                            .await
+                            .expect("failed to send to websocket sink");
                     }
                     Some(Err(err)) => {
                         eprintln!("got error from tcp stream: {:?}", err);
@@ -110,7 +105,8 @@ async fn handle_conn(target_url: url::Url, mut socket: TcpStream) {
                     }
                     None => {
                         eprintln!("tcp stream breakdown");
-                        ws_sink.send(Message::Close(None))
+                        ws_sink
+                            .send(Message::Close(None))
                             .await
                             .expect("failed to send to websocet sink");
                         return;
