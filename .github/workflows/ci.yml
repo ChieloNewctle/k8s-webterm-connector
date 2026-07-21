@@ -1,59 +1,67 @@
-name: Cargo Build & Test
+name: CI
+
 on:
   push:
+    branches:
+      - main
+    tags:
+      - "*"
   pull_request:
   workflow_dispatch:
+
 env:
   CARGO_TERM_COLOR: always
+
 permissions:
   contents: read
-  pull-requests: read
+
 jobs:
-  build-and-test:
-    name: Build & Test
+  style:
+    name: Style
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        toolchain:
-          - stable
     steps:
       - &checkout
         name: Checkout repository
         uses: actions/checkout@v7
         with:
-          fetch-depth: 0
           persist-credentials: false
-      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
-      - run: cargo build --verbose
-      - run: cargo test --verbose
-  rustfmt:
-    name: Check Format & Clippy
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt, clippy
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Rustfmt
+        run: cargo fmt --all --check
+
+  tests:
+    name: Tests
     runs-on: ubuntu-latest
     steps:
       - *checkout
-      - run: rustup update nightly && rustup default nightly
-      - run: rustup component add rustfmt
-      - run: cargo fmt --all --check
-      - run: rustup component add clippy
-      - run: cargo clippy
-        env:
-          RUSTFLAGS: "-D warnings"
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Check
+        run: cargo check --verbose
+      - name: Build
+        run: cargo build --verbose
+      - name: Test
+        run: cargo test --verbose
+
   dependabot:
-    name: Dependabot Auto-merge
-    if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'}}
-    needs: [build-and-test, rustfmt]
+    name: Dependabot auto-merge
+    if: github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'
+    needs: [style, tests]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
       contents: write
+      actions: write
     steps:
-      - id: metadata
-        uses: dependabot/fetch-metadata@v3
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - run: |
+      - name: Approve and merge
+        run: |
           gh pr review --approve "$PR_URL"
           gh pr merge --squash --auto "$PR_URL"
         env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
