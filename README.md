@@ -52,7 +52,7 @@ socat - tcp:127.0.0.1:27730
 
 ## SSH via k8s-webterm-connector
 
-> As long as an IO method exists, you can use it for SSH conneciton.
+> As long as an IO method exists, you can use it for SSH connection.
 
 `socat` and `openssh-server` should be installed in the image of the target containers.
 
