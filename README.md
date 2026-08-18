@@ -1,5 +1,3 @@
-
-
 # k8s-webterm-connector
 
 > Tired with web terminals?
